@@ -1,116 +1,118 @@
-## Hyprland for Void Linux
+# VUR - Void Linux Package Repository
 
-This repository contains template files and binaries for building or installing [Hyprland](https://github.com/hyprwm/Hyprland) on Void Linux.
+Repository for automated building and distribution of custom packages for Void Linux.
 
-### Installation
+## Overview
 
-The easiest way to install Hyprland on Void Linux is using the [binary repository](https://github.com/Makrennel/hyprland-void/tree/repository-x86_64-glibc) which is built automatically using [GitHub Actions](https://github.com/Makrennel/hyprland-void/blob/master/.github/workflows/build-latest.yml) whenever a new commit is pushed to this repository.
+This project provides an automated CI/CD pipeline using GitHub Actions to build packages from `srcpkgs/` templates and publish them to binary repositories accessible via `xbps-src` and `xbps-install`.
 
-You can add this repository to xbps's repositories by creating a file such as `/etc/xbps.d/hyprland-void.conf` with the following text:
+The system:
+- Automatically detects new packages in `srcpkgs/`
+- Respects package dependencies when building
+- Signs packages with a private key for secure distribution
+- Publishes compiled binaries to a dedicated Git branch (`repository-x86_64-glibc`)
+
+## Architecture
 
 ```
-repository=https://raw.githubusercontent.com/Makrennel/hyprland-void/repository-x86_64-glibc
+srcpkgs/
+├── package1/
+│   └── template          # Package definition (Void Linux format)
+├── package2/
+│   └── template
+└── ...
+
+scripts/
+├── set-environment       # Sets target architecture variables
+├── generate-build-order.kts  # Analyzes dependencies, generates build order
+├── clone-and-prepare     # Clones void-packages, merges custom packages
+├── build-packages        # Executes xbps-src for each package
+├── index-packages        # Copies compiled .xbps files
+├── sign-packages         # Signs binaries with private key
+└── push-repository       # Pushes binaries to Git branch
+
+.github/workflows/
+├── build-latest.yml      # Main CI: builds and publishes on push to master
+└── check.yml             # PR validation: lints templates and test builds
 ```
 
-This can be done with the following command:
-```
-echo repository=https://raw.githubusercontent.com/Makrennel/hyprland-void/repository-x86_64-glibc | sudo tee /etc/xbps.d/hyprland-void.conf
-```
-Then you need to refresh your repositories and accept the repository's fingerprint:
-```
+## How It Works
+
+### On Push to `master`
+
+1. **GitHub Actions** triggers `build-latest.yml`
+2. **generate-build-order.kts** parses all `srcpkgs/*/template` files, analyzes `depends=` declarations
+3. Packages are built in dependency order via `xbps-src`
+4. Compiled `.xbps` files are automatically collected
+5. Packages are signed with your private key
+6. Binaries are pushed to branch `repository-x86_64-glibc`
+
+### Installation from Repository
+
+Users can install packages by adding the repository:
+
+```bash
+echo 'repository=https://raw.githubusercontent.com/YOUR_ORG/VUR/repository-x86_64-glibc' | sudo tee /etc/xbps.d/vur.conf
 sudo xbps-install -S
+sudo xbps-install -S your-package
 ```
 
-You should now be able search through all hypr related packages provided by this repository, and install packages as usual:
+## Adding New Packages
 
-```
-xbps-query -Rs hypr
-sudo xbps-install -S hyprland xdg-desktop-portal-hyprland
-```
+1. Create directory: `srcpkgs/your-package/`
+2. Add `template` file following [Void Linux template format](https://docs.voidlinux.org/xbps/repositories/index.html)
+3. Declare dependencies in `depends="package1 package2 ..."`
+4. Push to `master` → CI automatically builds and publishes
 
-Currently this repository provides binary packages for:
+## Configuration
 
-- x86_64-glibc
-- x86_64-musl
-- aarch64-glibc
-- aarch64-musl
+### GitHub Secrets Required
 
-Change the end of the url in `/etc/xbps.d/hyprland-void.conf` as appropriate with the above options.
+Configure these in repository Settings → Secrets and variables → Actions:
 
-### Running
+| Secret | Purpose | How to Generate |
+|--------|---------|-----------------|
+| `PRIVATE_PEM_PASSPHRASE` | Password for your private signing key | Your choice |
+| `PEM_PAT` | GitHub token to access private key repository | [GitHub PAT (classic)](https://github.com/settings/tokens) with `repo` scope |
+| `ACCESS_GIT` | GitHub token for pushing binary branches | [GitHub PAT (classic)](https://github.com/settings/tokens) with `repo` scope |
 
-In order to run Hyprland you will need to install some additional packages which will depend on your setup, for example a [session and seat manager](https://docs.voidlinux.org/config/session-management.html) and [graphics drivers](https://docs.voidlinux.org/config/graphical-session/graphics-drivers/index.html). You may also have to add the user to the `_seatd` group. If you use an Nvidia GPU refer to the [Hyprland Wiki](https://wiki.hyprland.org/Nvidia), but keep in mind that Hyprland does not officially support Nvidia.
+### Setup Steps
 
-### Extra
-There are packages in this repository which may be of interest for:
+1. **Generate signing key** (or use existing):
+   ```bash
+   openssl genrsa -out private.pem 4096
+   ```
 
-- hypridle
-- hyprlock
-- hyprpaper
-- xdg-desktop-portal-hyprland
+2. **Create private repository** `hyprland-void-private-pem`:
+   - Store `private.pem` in repository root
+   - Keep repository private
 
-### Common Remarks
-#### "Why is this so out of date"?
+3. **Generate GitHub PAT**:
+   - Go to [github.com/settings/tokens](https://github.com/settings/tokens)
+   - Create "Tokens (classic)" with `repo` scope
+   - Use same token for `PEM_PAT` and `ACCESS_GIT`
 
-Upstream Void Linux packages are sometimes chronically out of date and Hyprland tends to follow the bleeding edge. I will not risk breaking someone's system by providing, for example, a core package like `GCC 14` ahead of whenever upstream is ready to do so.
+4. **Configure secrets**:
+   - `PRIVATE_PEM_PASSPHRASE`: Passphrase for your private.pem
+   - `PEM_PAT`: GitHub token from step 3
+   - `ACCESS_GIT`: Same token or different one
 
-#### "Will this be merged into upstream void-packages eventually?"
+## Project Structure
 
-Unless Void Linux's maintainers decide to change their opinion on the matter, the answer is no. Void Linux is hostile towards Hyprland, its developers, and community, so if this is a problem you should probably consider using a different distribution.
+- **hyprland-void/** - Main package repository with build scripts
+  - `srcpkgs/` - Package templates
+  - `scripts/` - Build automation scripts
+  - `.github/workflows/` - CI/CD workflows
+  - `common/shlibs` - Shared library definitions
 
-### Manually Building
+- **Workflows**:
+  - `build-latest.yml` - Production builds (triggered on push to master)
+  - `check.yml` - CI validation (runs on PRs and test branches)
 
-You may want to build these templates manually, for example if you have a specific configuration requirement that needs to be set at build time. Void-packages may sometimes have specific packages which are out of date from time to time that need to be updated beforehand in order to update Hyprland, which is why this repository is not simply forked off it. We need to copy the modifications from this repository on top of a fresh void-packages clone in order to build manually.
+## Credits
 
-1) You may want to start by making a directory where you can keep the relevant repositories
+This project is based on and adapted from [Makrennel/hyprland-void](https://github.com/Makrennel/hyprland-void), which provides an excellent reference implementation for automated Hyprland package building and distribution on Void Linux.
 
-```
-mkdir ~/repos
-cd ~/repos
-```
+## License
 
-2) Set up a [void-packages](https://github.com/void-linux/void-packages) clone for building templates files
-
-```
-git clone https://github.com/void-linux/void-packages
-cd void-packages
-./xbps-src binary-bootstrap
-cd ..
-```
-
-3) Clone this repository:
-
-```
-git clone https://github.com/Makrennel/hyprland-void.git
-cd hyprland-void
-```
-
-4) Append shared libraries to the end of your void-packages shared libraries
-
-```
-cat common/shlibs >> ../void-packages/common/shlibs
-```
-
-5) Copy srcpkgs to your void-packages srcpkgs directory
-
-```
-cp -r --remove-destination srcpkgs/* ../void-packages/srcpkgs
-```
-
-6) Build and install packages
-
-```
-cd ../void-packages
-./xbps-src pkg hyprland
-sudo xbps-install -R hostdir/binpkgs hyprland
-```
-
-### Contributing and Forking
-
-Any contributions are greatly appreciated, but please bear in mind that the build actions run on `x86_64` with `glibc` and you should make sure that it cross-compiles with xbps-src's `-a` flag for both `musl` and `aarch64` - for example with `./xbps-src -a aarch64-musl pkg new-hypr-package`.
-
-Please also try not to superfluously change things when pull requesting with this repository, and use your own name and email in the maintainer section of new templates: do not contribute on behalf of someone else if they are not involved with the pull request. Where possible, commit changes separately (rather than in huge lump commits) and describe the changes so contributions can be easily understood and cherry picked as needed.
-
-If you would like to create your own fork of this repository and use the build action for your own packages, you must either create a private repository called `hyprland-void-private-pem` where you will store your signing keys and fetch them using a GitHub Private Access Token stored in your repository's secrets called `PEM_PAT`, or store the signing key directly in your secrets and modify [`scripts/sign-packages`](https://github.com/Makrennel/hyprland-void/blob/master/scripts/sign-packages) and the [build action](https://github.com/Makrennel/hyprland-void/blob/master/.github/workflows/build-latest.yml) appropriately. You cannot install packages from remote repositories without signing them, and *DO NOT* put the private signing key in your public repository.  You will also need to create a GitHub Personal Access Token so that the action can delete, create, and push the branches where the finished packages and repodata is stored.
-
-For information on signing your repository, see the [Void Linux documentation](https://docs.voidlinux.org/xbps/repositories/signing.html) and `xbps-rindex`'s [man page](https://man.voidlinux.org/xbps-rindex.1).
+See [LICENSE](LICENSE) file.
