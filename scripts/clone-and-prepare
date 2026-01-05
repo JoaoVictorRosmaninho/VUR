@@ -8,7 +8,10 @@ COMMAND="
   cat common/shlibs >> /work/void-packages/common/shlibs
 
   # Keep only the packages defined in this repo to avoid upstream conflicts
-  rsync -a --delete srcpkgs/ /work/void-packages/srcpkgs/
+  rm -rf  /work/void-packages/srcpkgs
+
+  # Copy all packages from this repo to void-packages/srcpkgs
+  cp -vr /work/$REPO_NAME/srcpkgs /work/void-packages
 
   # List all files to verify
   echo 'Contents of /work/void-packages/srcpkgs/:'
