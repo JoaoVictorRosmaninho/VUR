@@ -64,6 +64,27 @@ sudo xbps-install -S your-package
 3. Declare dependencies in `depends="package1 package2 ..."`
 4. Push to `master` → CI automatically builds and publishes
 
+### Updating `common/shlibs`
+
+The `shlibs` file maps shared libraries (`.so`) to their providing packages. Update it when adding packages that provide libraries:
+
+**Format:**
+```
+LIBRARY_NAME PACKAGE_NAME-VERSION_REVISION
+```
+
+**Example:**
+If your package provides `libmylib.so.1` in version `1.0.0_1`:
+```
+libmylib.so.1 mylib-1.0.0_1
+```
+
+**Important notes:**
+- Only add entries for packages that provide `.so` files in `/usr/lib/`
+- The number after `.so` is the **ABI major version** (changes only on breaking changes)
+- Void Linux uses this for automatic dependency resolution
+- This file is automatically merged with Void's official `shlibs` during build
+
 ## Configuration
 
 ### GitHub Secrets Required
