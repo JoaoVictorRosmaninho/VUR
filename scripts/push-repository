@@ -14,7 +14,7 @@ COMMAND="
   git switch --orphan repository-$RESULT_NAME
 
   # Populate and push new binary repository
-  cp /work/packages/* ./
+  cp /work/packages/*.xbps ./
   git add .
   git commit -m \"Upload latest packages to repository\"
   git push -f https://$REPO_OWNER:$ACCESS_GIT@github.com/$REPO_OWNER/$REPO_NAME.git repository-$RESULT_NAME

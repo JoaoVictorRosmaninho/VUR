@@ -4,7 +4,9 @@
 
 COMMAND="
   mkdir /work/packages
+
   cp /work/hostdir/binpkgs/*.xbps /work/packages
+  
   cd /work/packages
   xbps-rindex -a *
 "
