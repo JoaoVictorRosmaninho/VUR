@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+# Simplified for x86_64 only
+echo "RESULT_NAME=x86_64-glibc" >> "$GITHUB_ENV"
+
