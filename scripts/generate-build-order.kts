@@ -11,7 +11,7 @@ import kotlin.io.path.forEachDirectoryEntry
 import kotlin.io.path.isDirectory
 import kotlin.io.path.name
 
-val repoName = System.getenv("REPO_NAME") ?: "hyprland-void"
+val repoName = System.getenv("REPO_NAME") ?: "VUR"
 val packages: MutableMap<String, HashSet<String>> = HashMap()
 
 // Get non-symlink directories in srcpkgs
