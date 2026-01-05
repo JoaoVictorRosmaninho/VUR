@@ -6,7 +6,6 @@ COMMAND="
 
   cd /work/$REPO_NAME
   cat common/shlibs >> /work/void-packages/common/shlibs
-  rm -rf /work/void-packages/srcpkgs/*
   cp -r srcpkgs/* /work/void-packages/srcpkgs
 
   chown -R builder:builder /work
