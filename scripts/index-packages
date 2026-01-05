@@ -8,9 +8,13 @@ COMMAND="
   # Copy all .xbps binaries from build output
   cp /work/hostdir/binpkgs/*.xbps /work/packages 2>/dev/null || true
   
-  # Generate repository index
-  cd /work/packages
-  xbps-rindex -a *.xbps
+  # Generate repository index if we have artifacts
+  if ls /work/packages/*.xbps >/dev/null 2>&1; then
+    cd /work/packages
+    xbps-rindex -a *.xbps
+  else
+    echo \"No packages to index; skipping xbps-rindex\"
+  fi
 "
 echo "Running command: $COMMAND"
 sh -c "$COMMAND"

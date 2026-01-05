@@ -6,7 +6,13 @@ COMMAND="
 
   cd /work/$REPO_NAME
   cat common/shlibs >> /work/void-packages/common/shlibs
-  cp -r srcpkgs/* /work/void-packages/srcpkgs
+
+  # Keep only the packages defined in this repo to avoid upstream conflicts
+  rsync -a --delete srcpkgs/ /work/void-packages/srcpkgs/
+
+  # List all files to verify
+  echo 'Contents of /work/void-packages/srcpkgs/:'
+  ls -la /work/void-packages/srcpkgs/
 
   chown -R builder:builder /work
 

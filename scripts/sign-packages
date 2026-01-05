@@ -12,8 +12,12 @@ COMMAND="
     -O -L https://api.github.com/repos/$REPO_OWNER/vur-pem/contents/private.pem
 
   # Sign packages
-  xbps-rindex --privkey /work/private.pem --sign --signedby \"$REPO_NAME-github-action\" /work/packages
-  xbps-rindex --privkey /work/private.pem --sign-pkg /work/packages/*.xbps
+  if ls /work/packages/*.xbps >/dev/null 2>&1; then
+    xbps-rindex --privkey /work/private.pem --sign --signedby \"$REPO_NAME-github-action\" /work/packages
+    xbps-rindex --privkey /work/private.pem --sign-pkg /work/packages/*.xbps
+  else
+    echo \"No packages to sign; skipping xbps-rindex\"
+  fi
 "
 
 echo "Running command: $COMMAND"
