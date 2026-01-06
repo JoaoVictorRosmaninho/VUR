@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/bash
 # Clone void-packages and prepare it by swapping in local packages
 cd /work
 git clone --depth 1 https://github.com/void-linux/void-packages.git
