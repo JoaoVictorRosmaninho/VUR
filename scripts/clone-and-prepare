@@ -7,13 +7,12 @@ COMMAND="
   cd /work/$REPO_NAME
   cat common/shlibs >> /work/void-packages/common/shlibs
 
-
   #swap packages from this repo into void-packages
-  for package in $(find /work/$REPO_NAME/srcpkgs -maxdepth 1 -mindepth 1 -type d -printf '%f\n'); do
-    echo \"Removing upstream package: $package\"
-    rm -rf /work/void-packages/srcpkgs/$package
-    echo \"Copying local package: $package\"
-    cp -vr /work/$REPO_NAME/srcpkgs/$package /work/void-packages/srcpkgs
+  for package in $(find /work/$REPO_NAME/srcpkgs -maxdepth 1 -mindepth 1 -type d -printf '%f\n'); do \
+    echo \"Removing upstream package: $package\" \
+    rm -rf /work/void-packages/srcpkgs/$package \
+    echo \"Copying local package: $package\" \
+    cp -vr /work/$REPO_NAME/srcpkgs/$package /work/void-packages/srcpkgs \
   done
 
   # List all files to verify
