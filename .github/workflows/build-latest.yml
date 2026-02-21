@@ -91,6 +91,7 @@ jobs:
           sudo -Eu builder $SCRIPT_DIR/05_sign-packages
 
       - name: Push new packages to binary repository
+        env:
+          ACCESS_GIT: ${{ secrets.ACCESS_GIT }}
         run: |
-          export ACCESS_GIT=${{ secrets.ACCESS_GIT }}
           sudo -Eu builder $SCRIPT_DIR/06_push-repository

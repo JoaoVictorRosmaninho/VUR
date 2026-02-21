@@ -2,13 +2,12 @@
 
 set -e
 
-mkdir -p /tmp/$REPO_NAME && cd /tmp/$REPO_NAME
+cd /work/$REPO_NAME 
 
 echo "[PushToRepository] - Actual dir => $(pwd)"
 
 # Config
 echo "[PushToRepository] - Configuring git user"
-git init .
 git config user.name \"github-actions[bot]\"
 git config user.email \"github-actions[bot]@users.noreply.github.com\"
 
