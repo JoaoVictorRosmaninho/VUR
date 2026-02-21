@@ -6,8 +6,8 @@ export PATH="/opt/xbps/usr/bin/:$PATH"
 # Entry on right repo
 cd /work/void-packages
 
-local changedpackages="${{ steps.changed.outputs.changedpackages }}"
-local removedpackages="${{ steps.changed.outputs.removedpackages }}"
+changedpackages="$CHANGEDPACKAGES"
+removedpackages="$REMOVEDPACKAGES"
 
 if [ -z "${changedpackages}" ] && [ -z "${removedpackages}" ]; then
     echo "[PrepareAndBuild] - Nothing has changed, exiting"

@@ -3,11 +3,9 @@ set -e
 
 echo "[IndexPackages] - Starting "
 
-echo "[IndexPackages] - Creating directory for packages "
-mkdir -p /work/packages
 
 echo "[IndexPackages] - Copy all .xbps binaries from build output "
-cp -vr /work/void-packges/hostdir/binpkgs/*.xbps /work/packages 2>/dev/null || true
+cp -vr /work/void-packages/hostdir/binpkgs/*.xbps /work/packages 2>/dev/null || true
 
 # Generate repository index if we have artifacts
 if ls /work/packages/*.xbps >/dev/null 2>&1; then

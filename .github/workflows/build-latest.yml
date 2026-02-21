@@ -42,6 +42,7 @@ jobs:
             echo "[CloneAndInitializeRepo] - Starting "
             
             mkdir /work && cd /work
+            mkdir packages
             
             echo "[CloneAndInitializeRepo] - clone repository "
             git clone https://github.com/$REPO_OWNER/$REPO_NAME.git VUR
@@ -67,12 +68,18 @@ jobs:
 
       - name: Determine changed templates
         id:   changed
+        env:
+          BASE: ${{ steps.cloneandinit.outputs.base }}
+          TIP: ${{ steps.cloneandinit.outputs.tip }}
         run:  $SCRIPT_DIR/01_changed-templates
         
       - name: Merge templates and edit shlibs
         run:  $SCRIPT_DIR/02_merge-and-edit-shlibs
 
       - name: prepare repo and build
+        env:
+          CHANGEDPACKAGES: ${{ steps.changed.outputs.changedpackages }}
+          REMOVEDPACKAGES: ${{ steps.changed.outputs.removedpackages }}
         run:  $SCRIPT_DIR/03_prepare-and-build
 
       - name: Copy relevant packages for indexing and signing
@@ -80,8 +87,8 @@ jobs:
           export PEM_PAT=${{ secrets.PEM_PAT }}
           export XBPS_PASSPHRASE=${{ secrets.PRIVATE_PEM_PASSPHRASE }}
           export XBPS_TARGET_ARCH=${{ env.TARGET_ARCH }}
-          sudo -Eu builder $SCRIPT_DIR/index-packages
-          sudo -Eu builder $SCRIPT_DIR/sign-packages
+          sudo -Eu builder $SCRIPT_DIR/04_index-packages
+          sudo -Eu builder $SCRIPT_DIR/05_sign-packages
 
       - name: Push new packages to binary repository
         run: |

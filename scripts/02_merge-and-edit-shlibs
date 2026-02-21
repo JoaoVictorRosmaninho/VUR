@@ -10,13 +10,13 @@ git checkout --detach master
 echo "[MergeAndEditShlibs] - clone xbps-src OK"
 
 echo "[MergeAndEditShlibs] - copying templates ..."
-cp -vr work/srcpkgs/* void-packages/srcpkgs/
+cp -vr /work/VUR/srcpkgs/* /work/void-packages/srcpkgs/
 echo "[MergeAndEditShlibs] - copying templates OK"
 
 echo "[MergeAndEditShlibs] - update common shlibs ..."
-local SHLIBS_FILE="void-packages/common/shlibs"
-local APPEND_FILE="work/common/shlibs"
-local REMOVE_FILE="work/shlibs_remove"
+SHLIBS_FILE="/work/void-packages/common/shlibs"
+APPEND_FILE="/work/VUR/common/shlibs"
+REMOVE_FILE="/work/work/shlibs_remove"
 
 if [ -f "$REMOVE_FILE" ]; then
     while IFS= read -r line; do
