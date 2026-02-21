@@ -1,0 +1,25 @@
+#!/usr/bin/bash
+# determine what templates changed before build
+echo "[ChangedTemplate] - Starting package diff identification"
+
+cd work
+# main commit hash
+base="${{ steps.cloneandinit.outputs.base }}"
+tip="${{ steps.cloneandinit.outputs.tip }}"
+
+echo "[ChangedTemplate] - tip: ${tip} base: ${base}"
+# get all changed files with git
+changed_packages=$( git diff --name-only "$base" "$tip" -- 'srcpkgs/*/template' \
+        | cut -d/ -f2 \
+        | sort -u \
+        | tr '\n' ' ')
+)
+removed_packages=$( git diff --diff-filter=d --name-only "$tip" "$base" -- 'srcpkgs/*/template')
+
+echo "[ChangedTemplate] - changed packages=${changed_packages:-<none>}"
+echo "[ChangedTemplate] - removed packages=${removed_packages:-<none>}"
+
+echo "changedpackages=$changed_packages" >> "$GITHUB_OUTPUT"
+echo "removedpackages=$removed_packages" >> "$GITHUB_OUTPUT"
+
+echo "[ChangedTemplate] - Finishing package diff identification"

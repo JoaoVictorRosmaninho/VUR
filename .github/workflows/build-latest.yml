@@ -28,25 +28,27 @@ jobs:
     steps:
       - name: Prepare container and create a non-root user
         run: |
+          # setup repos
           mkdir -p /etc/xbps.d && cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/
           sed -i 's|repo-default|repo-ci|g' /etc/xbps.d/*-repository-*.conf
+          # install dependencies
           xbps-install -Syu xbps && xbps-install -yu && xbps-install -y sudo bash grep curl git kotlin-bin
+          # create a non-root user
           useradd -G xbuilder -M builder
 
       - name: Clone VUR repo
-        run: |
-          mkdir /work && cd /work
-          git clone https://github.com/$REPO_OWNER/$REPO_NAME.git
-          $SCRIPT_DIR/set-environment
+        id:  cloneandinit
+        run: $SCRIPT_DIR/00_clone_and_initialize_repo
 
-      - name: Automatically generate a build order
-        run: $SCRIPT_DIR/generate-build-order.kts
+      - name: Determine changed templates
+        id:   changed
+        run:  $SCRIPT_DIR/01_changed-templates
+        
+      - name: Merge templates and edit shlibs
+        run:  $SCRIPT_DIR/02_merge-and-edit-shlibs
 
-      - name: Prepare void-packages
-        run: $SCRIPT_DIR/clone-and-prepare
-
-      - name: Build packages
-        run: $SCRIPT_DIR/build-packages
+      - name: prepare repo and build
+        run:  $SCRIPT_DIR/03_prepare-and-build
 
       - name: Copy relevant packages for indexing and signing
         run: |
@@ -59,4 +61,4 @@ jobs:
       - name: Push new packages to binary repository
         run: |
           export ACCESS_GIT=${{ secrets.ACCESS_GIT }}
-          sudo -Eu builder $SCRIPT_DIR/push-repository
+          sudo -Eu builder $SCRIPT_DIR/06_push-repository

@@ -1,0 +1,40 @@
+#!/bin/bash
+
+echo "[PrepareAndBuild] - Starting prepare and build ..."
+export PATH="/opt/xbps/usr/bin/:$PATH"
+
+# Entry on right repo
+cd /work/void-packages
+
+local changedpackages="${{ steps.changed.outputs.changedpackages }}"
+local removedpackages="${{ steps.changed.outputs.removedpackages }}"
+
+if [ -z "${changedpackages}" ] && [ -z "${removedpackages}" ]; then
+    echo "[PrepareAndBuild] - Nothing has changed, exiting"
+    exit 0
+fi
+
+if [ -n "$changedpackages" ]; then
+    PKGS=$(sudo -Eu builder ./xbps-src sort-dependencies $changedpackages)
+else
+    PKGS=""
+fi
+
+local failed=""
+
+for pkg in PKGS; do
+    if ! sudo -Eu builder ./xbps-src -j"$(nproc)" ${pkg}; then
+        echo "[PrepareAndBuild] - !! build failed for ${pkg}"
+        failed="${failed} ${pkg}"
+    fi
+done
+
+if [ -n "${failed}" ]; then
+    echo "[PrepareAndBuild] - build of following packages failed:"
+    for f in ${failed}; do
+        echo "[PrepareAndBuild] - ${f}"
+    done
+    exit 1
+fi
+
+echo "[PrepareAndBuild] - Starting prepare and prepare OK"
