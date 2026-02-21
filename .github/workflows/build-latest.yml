@@ -45,9 +45,9 @@ jobs:
             mkdir packages
             
             echo "[CloneAndInitializeRepo] - clone repository "
-            git clone https://github.com/$REPO_OWNER/$REPO_NAME.git VUR
+            git clone https://github.com/$REPO_OWNER/$REPO_NAME.git $REPO_NAME
             
-            echo "[CloneAndInitializeRepo] - Entry on VUR "
+            echo "[CloneAndInitializeRepo] - Entry on $REPO_NAME "
             cd VUR
             
             echo "[CloneAndInitializeRepo] - verify previus commit "

@@ -2,7 +2,10 @@
 # determine what templates changed before build
 echo "[ChangedTemplate] - Starting package diff identification"
 
-mkdir /work && cd /work
+cd /work/$REPO_NAME
+
+echo "[ChangedTemplate] - Actual dir => $(pwd)"
+
 # main commit hash
 base="$BASE"
 tip="$TIP"

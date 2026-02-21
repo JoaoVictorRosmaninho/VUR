@@ -1,25 +1,29 @@
-#!/usr/bin/env sh
+#!/bin/bash
 
-# We'll blow the size of the repository up very quickly if we do not delete old iterations of the repository
+set -e
 
-COMMAND="
-  cd /work/$REPO_NAME
+mkdir -p /tmp/$REPO_NAME && cd /tmp/$REPO_NAME
 
-  # Config
-  git config user.name \"github-actions[bot]\"
-  git config user.email \"github-actions[bot]@users.noreply.github.com\"
+echo "[PushToRepository] - Actual dir => $(pwd)"
 
-  # Delete old binary repository, create new one
-  git push https://$REPO_OWNER:$ACCESS_GIT@github.com/$REPO_OWNER/$REPO_NAME.git -d repository-$RESULT_NAME
-  git switch --orphan repository-$RESULT_NAME
+# Config
+echo "[PushToRepository] - Configuring git user"
+git init .
+git config user.name \"github-actions[bot]\"
+git config user.email \"github-actions[bot]@users.noreply.github.com\"
 
-  # Populate and push new binary repository
-  cp -vr /work/packages/* ./
-  git add .
-  git commit -m \"Upload latest packages to repository\"
-  git push -f https://$REPO_OWNER:$ACCESS_GIT@github.com/$REPO_OWNER/$REPO_NAME.git repository-$RESULT_NAME
-"
+# Delete old binary repository, create new one
+echo "[PushToRepository] - Deleting old binary repository"
+git push https://$REPO_OWNER:$ACCESS_GIT@github.com/$REPO_OWNER/$REPO_NAME.git -d repository-$RESULT_NAME
+git switch --orphan repository-$RESULT_NAME
 
-echo "Running command: $COMMAND"
-sh -c "$COMMAND"
+# Populate and push new binary repository
+echo "[PushToRepository] - Populating and pushing new binary repository"
+cp -vr /work/packages/* ./
 
+echo "[PushToRepository] - Adding files"
+git add .
+git commit -m \"Upload latest packages to repository\"
+git push -f https://$REPO_OWNER:$ACCESS_GIT@github.com/$REPO_OWNER/$REPO_NAME.git repository-$RESULT_NAME
+
+echo "[PushToRepository] - Done"
