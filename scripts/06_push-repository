@@ -11,16 +11,22 @@ git config user.email \"github-actions[bot]@users.noreply.github.com\"
 
 # Delete old binary repository, create new one
 echo "[PushToRepository] - Deleting old binary repository"
-git push https://$REPO_OWNER:$ACCESS_GIT@github.com/$REPO_OWNER/$REPO_NAME.git -d repository-$RESULT_NAME
-git switch --orphan repository-$RESULT_NAME
+git push https://$REPO_OWNER:$ACCESS_GIT@github.com/$REPO_OWNER/$REPO_NAME.git -d repository-$RESULT_NAME || true
+git switch --orphan repository-$RESULT_NAME || true
 
 # Populate and push new binary repository
 echo "[PushToRepository] - Populating and pushing new binary repository"
-cp -vr /work/packages/* ./
 
-echo "[PushToRepository] - Adding files"
-git add .
-git commit -m \"Upload latest packages to repository\"
-git push -f https://$REPO_OWNER:$ACCESS_GIT@github.com/$REPO_OWNER/$REPO_NAME.git repository-$RESULT_NAME
+if [ ! -d "/work/packages" ] || [ -z "$(ls -A /work/packages)" ]; then
+    echo "[PushToRepository] - No packages found, skipping push to repository"
+    exit 0
+else
+    echo "[PushToRepository] - Adding files"
+    cp -vr /work/packages/* ./
+    git add .
+    git commit -m \"Upload latest packages to repository\" || true
+    git push -f https://$REPO_OWNER:$ACCESS_GIT@github.com/$REPO_OWNER/$REPO_NAME.git repository-$RESULT_NAME || true
+
+fi
 
 echo "[PushToRepository] - Done"
