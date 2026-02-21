@@ -9,7 +9,7 @@ cd /work
 
 echo "[SignPackages] - Download .pem"
 
-curl -H "Authorization: token $PEM_PAT" \
+sudo -Eu builder curl -H "Authorization: token $PEM_PAT" \
      -H 'Accept: application/vnd.github.v3.raw' \
      -O -L https://api.github.com/repos/$REPO_OWNER/vur-pem/contents/private.pem
      
