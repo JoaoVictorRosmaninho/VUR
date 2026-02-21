@@ -11,7 +11,7 @@ cp -vr /work/void-packages/hostdir/binpkgs/*.xbps /work/packages 2>/dev/null || 
 if ls /work/packages/*.xbps >/dev/null 2>&1; then
     echo "[IndexPackages] - Indexing Packages"
     cd /work/packages
-    xbps-rindex -a *.xbps
+    sudo -Eu builder xbps-rindex -a *.xbps
 else
     echo "[IndexPackages] - No packages to index; skipping xbps-rindex"
 fi
