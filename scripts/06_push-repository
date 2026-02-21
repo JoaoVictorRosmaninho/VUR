@@ -2,8 +2,6 @@
 
 set -e
 
-cd /work/$REPO_NAME 
-
 echo "[PushToRepository] - Actual dir => $(pwd)"
 
 # Config
