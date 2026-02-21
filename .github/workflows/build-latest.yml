@@ -32,13 +32,38 @@ jobs:
           mkdir -p /etc/xbps.d && cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/
           sed -i 's|repo-default|repo-ci|g' /etc/xbps.d/*-repository-*.conf
           # install dependencies
-          xbps-install -Syu xbps && xbps-install -yu && xbps-install -y sudo bash grep curl git kotlin-bin
+          xbps-install -Syu xbps && xbps-install -yu && xbps-install -y sudo bash grep curl git
           # create a non-root user
           useradd -G xbuilder -M builder
 
       - name: Clone VUR repo
         id:  cloneandinit
-        run: $SCRIPT_DIR/00_clone_and_initialize_repo
+        run: |
+            echo "[CloneAndInitializeRepo] - Starting "
+            
+            mkdir /work && cd /work
+            
+            echo "[CloneAndInitializeRepo] - clone repository "
+            git clone https://github.com/$REPO_OWNER/$REPO_NAME.git VUR
+            
+            echo "[CloneAndInitializeRepo] - Entry on VUR "
+            cd VUR
+            
+            echo "[CloneAndInitializeRepo] - verify previus commit "
+            if [ -n "${{ github.event.before }}" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+                git fetch --no-tags origin "${{ github.event.before }}" --depth 1 || true
+            fi
+            
+            echo "[CloneAndInitializeRepo] - getting current commit "
+            git fetch --no-tags origin "${{ github.sha }}" --depth 1
+            
+            git checkout --detach "${{ github.sha }}"
+            
+            echo "RESULT_NAME=x86_64-glibc" >> "$GITHUB_ENV"
+            echo "base=${{github.event.before}}" >> "$GITHUB_OUTPUT"
+            echo "tip=${{github.sha}}" >> "$GITHUB_OUTPUT"
+            
+            echo "[CloneAndInitializeRepo] - Finish "
 
       - name: Determine changed templates
         id:   changed
