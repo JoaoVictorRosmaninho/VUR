@@ -92,7 +92,7 @@ jobs:
         env:
           CHANGEDPACKAGES: ${{ steps.changed.outputs.changedpackages }}
           REMOVEDPACKAGES: ${{ steps.changed.outputs.removedpackages }}
-        run:  $SCRIPT_DIR/03_prepare-and-build
+        run: sudo -Eu builder bash $SCRIPT_DIR/03_prepare-and-build
         
       - name: Remove old bin packages
         if: ${{ steps.changed.outputs.changedpackages != '' || steps.changed.outputs.removedpackages != '' }}
