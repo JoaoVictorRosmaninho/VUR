@@ -126,4 +126,4 @@ jobs:
           ACCESS_GIT: ${{ secrets.ACCESS_GIT }}
         run: |
           cd /work/$REPO_NAME
-          $SCRIPT_DIR/07_push-repository"
+          $SCRIPT_DIR/07_push-repository
