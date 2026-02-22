@@ -1,0 +1,55 @@
+#!/bin/bash
+
+set -e
+
+cd /work/$REPO_NAME
+
+echo "[PushToRepository] - Actual dir => $(pwd)"
+
+# Config
+echo "[PushToRepository] - Configuring git user"
+git config user.name "github-actions[bot]"
+git config user.email "github-actions[bot]@users.noreply.github.com"
+
+# Populate and push new binary repository
+echo "[PushToRepository] - Populating and pushing new binary repository"
+echo "[PushToRepository] - Checking for built packages"
+
+BRANCH="repository-$RESULT_NAME"
+REMOTE="https://$REPO_OWNER:$ACCESS_GIT@github.com/$REPO_OWNER/$REPO_NAME.git"
+
+# Check if binpkgs directory exists and has files
+if [ -d "/work/void-packages/hostdir/binpkgs" ] && [ -n "$(ls -A /work/void-packages/hostdir/binpkgs 2>/dev/null)" ]; then
+    echo "[PushToRepository] - Found built packages"
+    echo "[PushToRepository] - Adding files"
+else
+    echo "[PushToRepository] - No new packages found, skipping copy"
+    exit 1
+fi
+
+# Ensure we have the remote branch if it exists
+if git ls-remote --exit-code --heads "$REMOTE" "$BRANCH" >/dev/null 2>&1; then
+    echo "[PushToRepository] - Remote branch exists, fetching..."
+    git fetch "$REMOTE" "$BRANCH"
+    git checkout -B "$BRANCH" FETCH_HEAD
+else
+    echo "[PushToRepository] - Remote branch does not exist, creating orphan..."
+    git checkout --orphan "$BRANCH"
+fi
+
+# Add and commit changes
+rm -rf ./*
+cp -vr /work/void-packages/hostdir/binpkgs/* ./
+git add *.xbps
+git add *.xbps.sig2
+if git diff --cached --quiet; then
+    echo "[PushToRepository] - No changes to commit"
+else
+    echo "[PushToRepository] - Committing changes"
+    git commit -m "Upload latest packages to repository"
+fi
+
+# Push to repository
+echo "[PushToRepository] - Pushing to remote branch"
+git push -f "$REMOTE" "$BRANCH" || true
+echo "[PushToRepository] - Done"

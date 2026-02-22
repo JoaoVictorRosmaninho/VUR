@@ -1,0 +1,37 @@
+# Template file for 'obsidian'
+pkgname=obsidian
+version=1.10.6
+revision=1
+archs="x86_64"
+depends="glib bash zlib hicolor-icon-theme fuse electron35 desktop-file-utils"
+short_desc="Powerful knowledge base of plain text Markdown files"
+maintainer="JoaoVictor <joaovictorrosmaninho@gmail.com>"
+license="custom:Proprietary"
+homepage="https://obsidian.md/"
+distfiles="https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/obsidian-${version}.tar.gz"
+checksum=1596c81d8645ff9f6506b5b3e1a6963250d9372ceb58eb037551e53bc1b16f72
+
+do_install() {
+	# O tarball do obsidian vem com o binario 'obsidian' e resources.
+	# Como vamos usar o electron do sistema, ignoramos o binario deles
+	# e instalamos apenas os resources (app.asar) em /usr/lib/obsidian.
+
+	vmkdir usr/lib/obsidian
+	# Install only necessary resource files
+	vcopy resources/app.asar usr/lib/obsidian
+	if [ -d resources/app.asar.unpacked ]; then
+		vcopy resources/app.asar.unpacked usr/lib/obsidian
+	fi
+
+	# Instala nosso script wrapper que chama 'electron37 /usr/lib/obsidian/app.asar'
+	vbin ${FILESDIR}/obsidian.sh obsidian
+
+	# Instala o icone que vem no tarball
+	# O caminho dentro do tarball costuma ser resources/icon.png ou similar.
+	vinstall resources/icon.png 644 usr/share/pixmaps/obsidian.png
+
+	# Instala o arquivo .desktop que criamos em files/
+	vinstall ${FILESDIR}/obsidian.desktop 644 usr/share/applications/obsidian.desktop
+
+	vlicense ${FILESDIR}/LICENSE
+}

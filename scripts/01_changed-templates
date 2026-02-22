@@ -1,0 +1,36 @@
+#!/usr/bin/bash
+# determine what templates changed before build
+echo "[ChangedTemplate] - Starting package diff identification"
+
+cd /work/$REPO_NAME
+
+echo "[ChangedTemplate] - Actual dir => $(pwd)"
+
+# main commit hash
+base="$BASE"
+tip="$TIP"
+
+echo "[ChangedTemplate] - tip: ${tip} base: ${base}"
+# get all changed files with git
+
+if [ -z "$FORCEBUILD" ]; then
+        changed_packages=$( git diff --name-only "$base" "$tip" -- 'srcpkgs/*/template' \
+                | cut -d/ -f2 \
+                | sort -u \
+                | tr '\n' ' ')
+else
+        changed_packages=$(ls srcpkgs | tr '\n' ' ')
+fi
+        
+removed_packages=$( git diff --diff-filter=d --name-only "$tip" "$base" -- 'srcpkgs/*/template' \
+                | cut -d/ -f2 \
+                | sort -u \
+                | tr '\n' ' ')
+
+echo "[ChangedTemplate] - changed packages=${changed_packages:-<none>}"
+echo "[ChangedTemplate] - removed packages=${removed_packages:-<none>}"
+
+echo "changedpackages=$changed_packages" >> "$GITHUB_OUTPUT"
+echo "removedpackages=$removed_packages" >> "$GITHUB_OUTPUT"
+
+echo "[ChangedTemplate] - Finishing package diff identification"
