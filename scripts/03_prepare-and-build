@@ -2,7 +2,6 @@
 
 set -e
 
-tree /work
 
 echo "[PrepareAndBuild] - Starting prepare and build ..."
 export PATH="/opt/xbps/usr/bin/:$PATH"
@@ -18,6 +17,7 @@ if [ -z "${changedpackages}" ] && [ -z "${removedpackages}" ]; then
     exit 0
 fi
 
+
 if [ -n "$changedpackages" ]; then
     PKGS=$(sudo -Eu builder ./xbps-src sort-dependencies $changedpackages)
 else
@@ -32,6 +32,8 @@ for pkg in PKGS; do
         failed="${failed} ${pkg}"
     fi
 done
+
+[ -d "/work/void-packages/hostdir" ] && tree /work/void-packages/hostdir
 
 if [ -n "${failed}" ]; then
     echo "[PrepareAndBuild] - build of following packages failed:"
