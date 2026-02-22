@@ -3,15 +3,17 @@ set -e
 
 echo "[IndexPackages] - Starting "
 
+cd /work/void-packages/hostdir/binpkgs
 
-echo "[IndexPackages] - Copy all .xbps binaries from build output "
-cp -vr /work/void-packages/hostdir/binpkgs/*.xbps /work/packages 2>/dev/null || true
+echo "[IndexPackages] - Current Dir => ${pwd} "
 
 # Generate repository index if we have artifacts
-if ls /work/packages/*.xbps >/dev/null 2>&1; then
+if ls ./*.xbps >/dev/null 2>&1; then
     echo "[IndexPackages] - Indexing Packages"
-    cd /work/packages
     sudo -Eu builder xbps-rindex -a *.xbps
 else
     echo "[IndexPackages] - No packages to index; skipping xbps-rindex"
 fi
+
+echo "[IndexPackages] - Finish "
+

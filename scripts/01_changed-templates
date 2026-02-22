@@ -12,10 +12,15 @@ tip="$TIP"
 
 echo "[ChangedTemplate] - tip: ${tip} base: ${base}"
 # get all changed files with git
-changed_packages=$( git diff --name-only "$base" "$tip" -- 'srcpkgs/*/template' \
-        | cut -d/ -f2 \
-        | sort -u \
-        | tr '\n' ' ')
+
+if [ -z "$FORCEBUILD" ]; then
+        changed_packages=$( git diff --name-only "$base" "$tip" -- 'srcpkgs/*/template' \
+                | cut -d/ -f2 \
+                | sort -u \
+                | tr '\n' ' ')
+else
+        changed_packages=$(ls srcpkgs)
+fi
         
 removed_packages=$( git diff --diff-filter=d --name-only "$tip" "$base" -- 'srcpkgs/*/template')
 

@@ -20,7 +20,7 @@ else
     PKGS=""
 fi
 
-local failed=""
+failed=""
 
 for pkg in PKGS; do
     if ! sudo -Eu builder ./xbps-src -j"$(nproc)" ${pkg}; then

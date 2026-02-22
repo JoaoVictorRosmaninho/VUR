@@ -15,9 +15,10 @@ echo "[MergeAndEditShlibs] - copying templates OK"
 
 echo "[MergeAndEditShlibs] - update common shlibs ..."
 SHLIBS_FILE="/work/void-packages/common/shlibs"
-APPEND_FILE="/work/VUR/common/shlibs"
-REMOVE_FILE="/work/work/shlibs_remove"
+APPEND_FILE="/work/$REPO_NAME/common/shlibs"
+REMOVE_FILE="/work/$REPO_NAME/shlibs_remove"
 
+# todo: remove this
 if [ -f "$REMOVE_FILE" ]; then
     while IFS= read -r line; do
         [ -z "$line" ] && continue # Verifying if the string line is empty

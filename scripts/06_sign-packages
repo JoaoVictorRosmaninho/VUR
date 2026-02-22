@@ -3,7 +3,9 @@ set -e
 
 echo "[SignPackages] - Sign Packages"
 
-cd /work
+cd /work/void-packages/hostdir/binpkgs
+
+echo "[IndexPackages] - Current Dir => ${pwd} "
 
 echo "[SignPackages] - Download .pem"
 
@@ -15,9 +17,9 @@ curl -H "Authorization: token $PEM_PAT" \
 echo "[SignPackages] - Downloaded .pem"
 
 # Sign packages
-if ls /work/packages/*.xbps >/dev/null 2>&1; then
-    xbps-rindex --privkey /tmp/private.pem --sign --signedby \"$REPO_NAME-github-action\" /work/packages
-    xbps-rindex --privkey /tmp/private.pem --sign-pkg /work/packages/*.xbps
+if ls ./*.xbps >/dev/null 2>&1; then
+    xbps-rindex --privkey /tmp/private.pem --sign --signedby \"$REPO_NAME-github-action\" ./
+    xbps-rindex --privkey /tmp/private.pem --sign-pkg ./*.xbps
 else
     echo "[SignPackages] - No packages to sign; skipping xbps-rindex"
 fi
