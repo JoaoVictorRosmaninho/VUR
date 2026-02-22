@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -e
+
+tree /work
+
 echo "[PrepareAndBuild] - Starting prepare and build ..."
 export PATH="/opt/xbps/usr/bin/:$PATH"
 
@@ -38,4 +42,3 @@ if [ -n "${failed}" ]; then
 fi
 
 echo "[PrepareAndBuild] - Starting prepare and prepare OK"
-tree /work
