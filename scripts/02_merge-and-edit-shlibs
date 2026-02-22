@@ -14,7 +14,7 @@ echo "[MergeAndEditShlibs] - copying templates OK"
 echo "[MergeAndEditShlibs] - update common shlibs ..."
 SHLIBS_FILE="/work/void-packages/common/shlibs"
 APPEND_FILE="/work/$REPO_NAME/common/shlibs"
-REMOVE_FILE="/work/$REPO_NAME/shlibs_remove"
+REMOVE_FILE="/work/$REPO_NAME/common/shlibs_remove"
 
 # todo: remove this
 if [ -f "$REMOVE_FILE" ]; then
