@@ -19,14 +19,17 @@ fi
 
 
 if [ -n "$changedpackages" ]; then
+    echo "[PrepareAndBuild] - Changed packages: ${changedpackages}"
     PKGS=$(sudo -Eu builder ./xbps-src sort-dependencies $changedpackages)
 else
+    echo "[PrepareAndBuild] - No changed packages, skipping build"
     PKGS=""
 fi
 
 failed=""
 
-for pkg in PKGS; do
+echo "[PrepareAndBuild] - Building packages: ${PKGS}"
+for pkg in $PKGS; do
     if ! sudo -Eu builder ./xbps-src -j"$(nproc)" ${pkg}; then
         echo "[PrepareAndBuild] - !! build failed for ${pkg}"
         failed="${failed} ${pkg}"
@@ -43,4 +46,4 @@ if [ -n "${failed}" ]; then
     exit 1
 fi
 
-echo "[PrepareAndBuild] - Starting prepare and prepare OK"
+echo "[PrepareAndBuild] - Starting prepare and build OK"
