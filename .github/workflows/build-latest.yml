@@ -5,6 +5,14 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      forceBuild:
+        description: "Force packages build"
+        required: false
+        type: choice
+        options:
+          - true
+          - false
 
 jobs:
   build:
@@ -70,28 +78,37 @@ jobs:
         env:
           BASE: ${{ steps.cloneandinit.outputs.base }}
           TIP: ${{ steps.cloneandinit.outputs.tip }}
+          FORCEBUILD: ${{ github.event.inputs.forceBuild }}
         run:  $SCRIPT_DIR/01_changed-templates
         
       - name: Merge templates and edit shlibs
         run:  $SCRIPT_DIR/02_merge-and-edit-shlibs
+
 
       - name: prepare repo and build
         env:
           CHANGEDPACKAGES: ${{ steps.changed.outputs.changedpackages }}
           REMOVEDPACKAGES: ${{ steps.changed.outputs.removedpackages }}
         run:  $SCRIPT_DIR/03_prepare-and-build
+        
+      - name: Remove old bin packages
+        env:
+          CHANGEDPACKAGES: ${{ steps.changed.outputs.changedpackages }}
+          REMOVEDPACKAGES: ${{ steps.changed.outputs.removedpackages }}
+          ACCESS_GIT: ${{ secrets.ACCESS_GIT }}
+        run:  $SCRIPT_DIR/04_remove_old_files
 
       - name: Copy relevant packages for indexing and signing
         run: |
           export PEM_PAT=${{ secrets.PEM_PAT }}
           export XBPS_PASSPHRASE=${{ secrets.PRIVATE_PEM_PASSPHRASE }}
           export XBPS_TARGET_ARCH=${{ env.TARGET_ARCH }}
-          sudo -Eu builder $SCRIPT_DIR/04_index-packages
-          sudo -Eu builder $SCRIPT_DIR/05_sign-packages
+          sudo -Eu builder $SCRIPT_DIR/05_index-packages
+          sudo -Eu builder $SCRIPT_DIR/06_sign-packages
 
       - name: Push new packages to binary repository
         env:
           ACCESS_GIT: ${{ secrets.ACCESS_GIT }}
         run: |
           cd /work/$REPO_NAME
-          bash -c " cd /work/$REPO_NAME && $SCRIPT_DIR/06_push-repository"
+          $SCRIPT_DIR/07_push-repository"
