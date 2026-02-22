@@ -38,3 +38,4 @@ if [ -n "${failed}" ]; then
 fi
 
 echo "[PrepareAndBuild] - Starting prepare and prepare OK"
+tree /work
