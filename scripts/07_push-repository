@@ -22,9 +22,9 @@ REMOTE="https://$REPO_OWNER:$ACCESS_GIT@github.com/$REPO_OWNER/$REPO_NAME.git"
 if [ -d "/work/void-packages/hostdir/binpkgs" ] && [ -n "$(ls -A /work/void-packages/hostdir/binpkgs 2>/dev/null)" ]; then
     echo "[PushToRepository] - Found built packages"
     echo "[PushToRepository] - Adding files"
-    cp -vr /work/void-packages/hostdir/binpkgs/* ./
 else
     echo "[PushToRepository] - No new packages found, skipping copy"
+    exit 1
 fi
 
 # Ensure we have the remote branch if it exists
@@ -38,6 +38,8 @@ else
 fi
 
 # Add and commit changes
+rm -rf ./*
+cp -vr /work/void-packages/hostdir/binpkgs/* ./
 git add *.xbps
 git add *.xbps.sig2
 if git diff --cached --quiet; then
