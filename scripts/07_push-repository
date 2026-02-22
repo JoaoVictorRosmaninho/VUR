@@ -14,8 +14,8 @@ git config user.email \"github-actions[bot]@users.noreply.github.com\"
 # Populate and push new binary repository
 echo "[PushToRepository] - Populating and pushing new binary repository"
 echo "[PushToRepository] - Adding files"
-cp -vr /work/void-packages/hostdir/binpkgs/* ./
-git add .
-git commit -m \"Upload latest packages to repository\" || true
-git push -f https://$REPO_OWNER:$ACCESS_GIT@github.com/$REPO_OWNER/$REPO_NAME.git repository-$RESULT_NAME || true
+sudo -Eu builder cp -vr /work/void-packages/hostdir/binpkgs/* ./
+sudo -Eu builder git add .
+sudo -Eu builder git commit -m \"Upload latest packages to repository\" || true
+sudo -Eu builder git push -f https://$REPO_OWNER:$ACCESS_GIT@github.com/$REPO_OWNER/$REPO_NAME.git repository-$RESULT_NAME || true
 echo "[PushToRepository] - Done"

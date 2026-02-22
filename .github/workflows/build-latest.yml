@@ -124,6 +124,4 @@ jobs:
         if: ${{ steps.changed.outputs.changedpackages != '' || steps.changed.outputs.removedpackages != '' }}
         env:
           ACCESS_GIT: ${{ secrets.ACCESS_GIT }}
-        run: |
-          cd /work/$REPO_NAME
-          $SCRIPT_DIR/07_push-repository
+        run: $SCRIPT_DIR/07_push-repository
