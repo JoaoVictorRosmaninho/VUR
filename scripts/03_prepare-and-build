@@ -47,7 +47,10 @@ if [ -n "${failed}" ]; then
     for f in ${failed}; do
         echo "[PrepareAndBuild] - ${f}"
     done
-    exit 1
+    # exit 1
 fi
+
+
+echo "failed=$failed" >> "$GITHUB_OUTPUT"
 
 echo "[PrepareAndBuild] - Starting prepare and build OK"

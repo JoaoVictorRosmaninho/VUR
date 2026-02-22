@@ -42,6 +42,8 @@ find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
 echo "[PushToRepository] - Copying packages to repository"
 cp -vr /work/void-packages/hostdir/binpkgs/* ./
 
+echo "$FAILED_PACKAGES" > failed_packages.txt
+
 echo "[PushToRepository] - Adding files to git"
 git add -A
 
