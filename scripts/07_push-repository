@@ -38,7 +38,8 @@ else
 fi
 
 # Add and commit changes
-git add -A
+git add *.xbps
+git add *.xbps.sig2
 if git diff --cached --quiet; then
     echo "[PushToRepository] - No changes to commit"
 else
