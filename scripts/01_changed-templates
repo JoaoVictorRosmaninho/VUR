@@ -22,7 +22,10 @@ else
         changed_packages=$(ls srcpkgs)
 fi
         
-removed_packages=$( git diff --diff-filter=d --name-only "$tip" "$base" -- 'srcpkgs/*/template')
+removed_packages=$( git diff --diff-filter=d --name-only "$tip" "$base" -- 'srcpkgs/*/template' \
+                | cut -d/ -f2 \
+                | sort -u \
+                | tr '\n' ' ')
 
 echo "[ChangedTemplate] - changed packages=${changed_packages:-<none>}"
 echo "[ChangedTemplate] - removed packages=${removed_packages:-<none>}"
