@@ -27,12 +27,15 @@ else
 fi
 
 failed=""
+built=""
 
 echo "[PrepareAndBuild] - Building packages: ${PKGS}"
 for pkg in $PKGS; do
-    echo "[PrepareAndBuild] - Copying: /work/$REPO_NAME/srcpkgs/$pkg to $(pwd)/srcpkgs"
-    cp -vr /work/$REPO_NAME/srcpkgs/$pkg ./srcpkgs
-    if ! sudo -Eu builder ./xbps-src -j"$(nproc)" ${pkg}; then
+    
+    if sudo -Eu builder ./xbps-src -j"$(nproc)" pkg "${pkg}"; then
+        echo "[PrepareAndBuild] - Successfully built ${pkg}"
+        built="${built} ${pkg}"
+    else
         echo "[PrepareAndBuild] - !! build failed for ${pkg}"
         failed="${failed} ${pkg}"
     fi
