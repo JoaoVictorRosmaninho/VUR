@@ -88,11 +88,19 @@ jobs:
         run:  $SCRIPT_DIR/02_merge-and-edit-shlibs
 
 
-      - name: prepare repo and build
+      - name: Prepare masterdir
+        run: |
+            cd /work/void-packages
+            chown -R builder:builder . &&
+            sudo -Eu builder common/travis/set_mirror.sh &&
+            sudo -Eu builder common/travis/prepare.sh &&
+            common/travis/fetch-xtools.sh
+
+      - name: build
         env:
           CHANGEDPACKAGES: ${{ steps.changed.outputs.changedpackages }}
           REMOVEDPACKAGES: ${{ steps.changed.outputs.removedpackages }}
-        run: sudo -Eu builder bash $SCRIPT_DIR/03_prepare-and-build
+        run: $SCRIPT_DIR/03_prepare-and-build
         
       - name: Remove old bin packages
         if: ${{ steps.changed.outputs.changedpackages != '' || steps.changed.outputs.removedpackages != '' }}
