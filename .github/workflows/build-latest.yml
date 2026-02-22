@@ -99,6 +99,7 @@ jobs:
           CHANGEDPACKAGES: ${{ steps.changed.outputs.changedpackages }}
           REMOVEDPACKAGES: ${{ steps.changed.outputs.removedpackages }}
           ACCESS_GIT: ${{ secrets.ACCESS_GIT }}
+        working-directory: /work/void-packages/hostdir/binpkgs
         run:  $SCRIPT_DIR/04_remove_old_files
 
       - name: Copy relevant packages for indexing and signing

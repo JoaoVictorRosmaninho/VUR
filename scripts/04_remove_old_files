@@ -2,8 +2,6 @@
 
 set -e
 
-cd /work/void-packages/hostdir/binpkgs
-
 echo "[RemoveOldFiles] - Actual dir => $(pwd)"
 
 echo "[RemoveOldFiles] - Set git variables"
