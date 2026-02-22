@@ -113,12 +113,13 @@ jobs:
 
       - name: Copy relevant packages for indexing and signing
         if: ${{ steps.changed.outputs.changedpackages != '' || steps.changed.outputs.removedpackages != '' }}
+        env:
+          PEM_PAT: ${{ secrets.PEM_PAT }}
+          XBPS_PASSPHRASE: ${{ secrets.PRIVATE_PEM_PASSPHRASE }}
+          XBPS_TARGET_ARCH: ${{ env.TARGET_ARCH }}
         run: |
-          export PEM_PAT=${{ secrets.PEM_PAT }}
-          export XBPS_PASSPHRASE=${{ secrets.PRIVATE_PEM_PASSPHRASE }}
-          export XBPS_TARGET_ARCH=${{ env.TARGET_ARCH }}
-          sudo -Eu builder $SCRIPT_DIR/05_index-packages
-          sudo -Eu builder $SCRIPT_DIR/06_sign-packages
+          $SCRIPT_DIR/05_index-packages
+          $SCRIPT_DIR/06_sign-packages
 
       - name: Push new packages to binary repository
         if: ${{ steps.changed.outputs.changedpackages != '' || steps.changed.outputs.removedpackages != '' }}
