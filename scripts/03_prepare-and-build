@@ -30,13 +30,14 @@ failed=""
 
 echo "[PrepareAndBuild] - Building packages: ${PKGS}"
 for pkg in $PKGS; do
+    echo "[PrepareAndBuild] - Copying: /work/$REPO_NAME/srcpkgs/$pkg to $(pwd)/srcpkgs"
+    cp -vr /work/$REPO_NAME/srcpkgs/$pkg ./srcpkgs
     if ! sudo -Eu builder ./xbps-src -j"$(nproc)" ${pkg}; then
         echo "[PrepareAndBuild] - !! build failed for ${pkg}"
         failed="${failed} ${pkg}"
     fi
 done
 
-[ -d "/work/void-packages/hostdir" ] && tree /work/void-packages/hostdir
 
 if [ -n "${failed}" ]; then
     echo "[PrepareAndBuild] - build of following packages failed:"
