@@ -19,7 +19,7 @@ if [ -z "$FORCEBUILD" ]; then
                 | sort -u \
                 | tr '\n' ' ')
 else
-        changed_packages=$(ls srcpkgs)
+        changed_packages=$(ls srcpkgs | tr '\n' ' ')
 fi
         
 removed_packages=$( git diff --diff-filter=d --name-only "$tip" "$base" -- 'srcpkgs/*/template' \
