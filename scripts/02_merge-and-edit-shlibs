@@ -3,9 +3,7 @@
 echo "[MergeAndEditShlibs] - Starting process"
 
 echo "[MergeAndEditShlibs] - clone xbps-src ..."
-cd /work
-git clone --depth 1 https://github.com/void-linux/void-packages.git void-packages
-cd void-packages
+cd /work/void-packages
 git checkout --detach master
 echo "[MergeAndEditShlibs] - clone xbps-src OK"
 
