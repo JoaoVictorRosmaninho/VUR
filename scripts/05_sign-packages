@@ -1,0 +1,41 @@
+#!/bin/bash
+set -e
+
+echo "[SignPackages] - Starting indexing and signing"
+
+cd /work/void-packages/hostdir/binpkgs
+
+echo "[SignPackages] - Current Dir => $(pwd)"
+
+# Check if we have packages
+if ! ls ./*.xbps >/dev/null 2>&1; then
+    echo "[SignPackages] - No packages found; skipping"
+    exit 0
+fi
+
+echo "[SignPackages] - Download .pem"
+curl -H "Authorization: token $PEM_PAT" \
+     -H 'Accept: application/vnd.github.v3.raw' \
+     -L https://api.github.com/repos/$REPO_OWNER/vur-pem/contents/private.pem \
+     -o /tmp/private.pem
+     
+echo "[SignPackages] - Downloaded .pem"
+chmod 600 /tmp/private.pem
+
+echo "[SignPackages] - Adding packages to index"
+xbps-rindex -a *.xbps || true
+
+echo "[SignPackages] - Removing obsolete entries"
+xbps-rindex -r "$PWD"
+
+echo "[SignPackages] - Signing repository"
+xbps-rindex -s --signedby "$REPO_NAME-github-action" --privkey /tmp/private.pem "$PWD"
+
+echo "[SignPackages] - Signing individual packages"
+xbps-rindex -S --privkey /tmp/private.pem "$PWD"/*.xbps
+
+echo "[SignPackages] - Cleaning up index"
+xbps-rindex -c "$PWD"
+
+rm -f /tmp/private.pem
+echo "[SignPackages] - Done"

@@ -112,15 +112,15 @@ jobs:
         working-directory: /work/void-packages/hostdir/binpkgs
         run:  $SCRIPT_DIR/04_remove_old_files
 
-      - name: Copy relevant packages for indexing and signing
+      - name: Index and sign packages
         if: ${{ steps.changed.outputs.changedpackages != '' || steps.changed.outputs.removedpackages != '' }}
         env:
           PEM_PAT: ${{ secrets.PEM_PAT }}
           XBPS_PASSPHRASE: ${{ secrets.PRIVATE_PEM_PASSPHRASE }}
           XBPS_TARGET_ARCH: ${{ env.TARGET_ARCH }}
-        run: |
-          $SCRIPT_DIR/05_index-packages
-          $SCRIPT_DIR/06_sign-packages
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: $SCRIPT_DIR/05_sign-packages
 
       - name: Push new packages to binary repository
         if: ${{ steps.changed.outputs.changedpackages != '' || steps.changed.outputs.removedpackages != '' }}
@@ -130,4 +130,4 @@ jobs:
           REPO_NAME: ${{ github.event.repository.name }}
           RESULT_NAME: ${{ env.RESULT_NAME }}
           FAILED_PACKAGES: ${{ steps.build.outputs.failed }}
-        run: $SCRIPT_DIR/07_push-repository
+        run: $SCRIPT_DIR/06_push-repository
