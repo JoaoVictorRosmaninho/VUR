@@ -124,4 +124,7 @@ jobs:
         if: ${{ steps.changed.outputs.changedpackages != '' || steps.changed.outputs.removedpackages != '' }}
         env:
           ACCESS_GIT: ${{ secrets.ACCESS_GIT }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          RESULT_NAME: ${{ env.RESULT_NAME }}
         run: $SCRIPT_DIR/07_push-repository

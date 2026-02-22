@@ -24,14 +24,14 @@ rm -rf ./*
 echo "[RemoveOldFiles] - copy new packages to temp dir"
 if git ls-remote --exit-code --heads "$REMOTE" "$BRANCH" >/dev/null 2>&1; then
     echo "[RemoveOldFiles] - Cloning remote repository"
-    git clone --depth 1 --branch "$REMOTE" "$BRANCH" /tmp/oldrepo
+    git clone --depth 1 --branch "$BRANCH" "$REMOTE" /tmp/oldrepo
 
     echo "[RemoveOldFiles] - Copy oldrepo binpkgs"
     cp -v /tmp/oldrepo/*.xbps ./ 2> /dev/null || true
     cp -v /tmp/oldrepo/*.xbps.sig ./ 2> /dev/null || true
     cp -v /tmp/oldrepo/index* ./ 2> /dev/null || true
 
-    if [ -d "/tmp/oldrepo" ] && [ -z $(ls -A /tmp/oldrepo) ]; then
+    if [ -d "/tmp/oldrepo" ] && [ -n "$(ls -A /tmp/oldrepo)" ]; then
 
        echo "[RemoveOldFiles] - Delete rebuilded packages"
     
@@ -59,6 +59,6 @@ if git ls-remote --exit-code --heads "$REMOTE" "$BRANCH" >/dev/null 2>&1; then
     fi
 fi;
 
-echo "[RemoveOldFiles] - Move back the new packages do binpkgs"
-mv -v /tmp/newpkgs/*.xbps /work/$REPO_NAME/void-packages/hostdir/binpkgs  2> /dev/null || true
-mv -v /tmp/newpkgs/*.xbps.sig  /work/$REPO_NAME/void-packages/hostdir/binpkgs 2> /dev/null || true
+echo "[RemoveOldFiles] - Move back the new packages to binpkgs"
+mv -v /tmp/newpkgs/*.xbps /work/void-packages/hostdir/binpkgs  2> /dev/null || true
+mv -v /tmp/newpkgs/*.xbps.sig  /work/void-packages/hostdir/binpkgs 2> /dev/null || true
